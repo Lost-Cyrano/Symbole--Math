@@ -1,0 +1,9 @@
+∈ | Appartient à...
+∀ | Pour tout...
+∃ | Il existe...
+∅ | Ensemble vide
+∫ | Intégrale
+± | Plus ou moins
+√ | Racine carrée
+≠ | Différent de
+≈ | Approximativement égal à
