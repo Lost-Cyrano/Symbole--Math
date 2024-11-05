@@ -1,9 +1,40 @@
-∈ | Appartient à...
-∀ | Pour tout...
-∃ | Il existe...
+[ENSEMBLES]
+∈ | Appartient à
+∉ | N'appartient pas à
 ∅ | Ensemble vide
-∫ | Intégrale
+⊆ | Sous-ensemble de
+⊂ | Strictement sous-ensemble de
+⊇ | Contient comme sous-ensemble
+⊃ | Strictement contient
+∪ | Union
+∩ | Intersection
+℘ | Ensemble des parties
+𝒫 | Ensemble des parties (notation alternative)
+ℕ | Ensemble des nombres naturels
+ℤ | Ensemble des nombres entiers
+ℚ | Ensemble des nombres rationnels
+ℝ | Ensemble des nombres réels
+ℂ | Ensemble des nombres complexes
+|A| | Cardinal de A (nombre d'éléments de A)
+Aᶜ | Complément de A
+A - B | Différence entre les ensembles A et B
+A × B | Produit cartésien de A et B
+
+[INÉQUATIONS]
+= | Égal à
+≠ | Différent de
+< | Inférieur à
+> | Supérieur à
+≤ | Inférieur ou égal à
+≥ | Supérieur ou égal à
+≪ | Beaucoup plus petit que
+≫ | Beaucoup plus grand que
+∝ | Proportionnel à
+∞ | Infini
 ± | Plus ou moins
 √ | Racine carrée
-≠ | Différent de
-≈ | Approximativement égal à ...
+∛ | Racine cubique
+∜ | Racine quatrième
+∑ | Somme
+∏ | Produit
+∫ | Intégrale
