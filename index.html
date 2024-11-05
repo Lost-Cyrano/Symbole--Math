@@ -1,1 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau des Symboles Mathématiques</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #007acc;
+            margin-top: 20px;
+        }
+        #search-bar {
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        table {
+            width: 80%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 1.1rem;
+        }
+        th {
+            background-color: #007acc;
+            color: white;
+        }
+        td {
+            cursor: pointer;
+            position: relative;
+        }
+        .copied-notice {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #007acc;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
 
+<h1>Tableau des Symboles Mathématiques</h1>
+<input type="text" id="search-bar" placeholder="Rechercher un symbole ou une description..." oninput="filtrerSymboles()">
+
+<table id="symbolTable">
+    <thead>
+        <tr>
+            <th>Symbole</th>
+            <th>Explication / Traduction</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Le contenu est généré dynamiquement -->
+    </tbody>
+</table>
+
+<script>
+    let symboles = [];  // Stocke les symboles chargés depuis le fichier texte
+
+    // Fonction pour charger le fichier symboles.txt
+    async function chargerSymboles() {
+        const response = await fetch('symboles.txt');
+        const data = await response.text();
+        symboles = data.split('\n').filter(line => line.trim() !== "").map(line => {
+            const [symbole, explication] = line.split('|').map(item => item.trim());
+            return { symbole, explication };
+        });
+        genererTableau(symboles);
+    }
+
+    // Génère le tableau avec les symboles fournis
+    function genererTableau(symbolesAFiltrer) {
+        const tbody = document.getElementById("symbolTable").querySelector("tbody");
+        tbody.innerHTML = "";  // Nettoyage de contenu précédent
+
+        symbolesAFiltrer.forEach((item) => {
+            const row = document.createElement("tr");
+
+            // Crée la cellule du symbole avec un événement de clic
+            const symboleCell = document.createElement("td");
+            symboleCell.textContent = item.symbole;
+            symboleCell.onclick = () => copyToClipboard(item.symbole, symboleCell);
+            const notice = document.createElement("span");
+            notice.classList.add("copied-notice");
+            notice.textContent = "Copié !";
+            symboleCell.appendChild(notice);
+
+            // Crée la cellule de l'explication
+            const explicationCell = document.createElement("td");
+            explicationCell.textContent = item.explication;
+
+            row.appendChild(symboleCell);
+            row.appendChild(explicationCell);
+            tbody.appendChild(row);
+        });
+    }
+
+    // Fonction pour copier le symbole dans le presse-papier
+    function copyToClipboard(symbol, cell) {
+        navigator.clipboard.writeText(symbol).then(() => {
+            const notice = cell.querySelector('.copied-notice');
+            notice.classList.add('show');
+            setTimeout(() => {
+                notice.classList.remove('show');
+            }, 1000); // Le message disparaît après 1 seconde
+        });
+    }
+
+    // Fonction de filtrage pour la barre de recherche
+    function filtrerSymboles() {
+        const query = document.getElementById("search-bar").value.toLowerCase();
+        const symbolesFiltrés = symboles.filter(item =>
+            item.symbole.toLowerCase().includes(query) || item.explication.toLowerCase().includes(query)
+        );
+        genererTableau(symbolesFiltrés);
+    }
+
+    // Charger les symboles au démarrage de la page
+    document.addEventListener("DOMContentLoaded", chargerSymboles);
+</script>
+
+</body>
+</html>
