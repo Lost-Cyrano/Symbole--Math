@@ -6,4 +6,4 @@
 ± | Plus ou moins
 √ | Racine carrée
 ≠ | Différent de
-≈ | Approximativement égal à
+≈ | Approximativement égal à ...
