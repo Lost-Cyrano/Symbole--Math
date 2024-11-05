@@ -1,4 +1,4 @@
-[ENSEMBLES]
+CHAPITRE | ENSEMBLES
 ∈ | Appartient à
 ∉ | N'appartient pas à
 ∅ | Ensemble vide
@@ -19,8 +19,7 @@
 Aᶜ | Complément de A
 A - B | Différence entre les ensembles A et B
 A × B | Produit cartésien de A et B
-
-[INÉQUATIONS]
+CHAPITRE | INÉQUATIONS
 = | Égal à
 ≠ | Différent de
 < | Inférieur à
