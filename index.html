@@ -18,6 +18,12 @@
             color: #007acc;
             margin-top: 20px;
         }
+        .theme-title {
+            color: #007acc;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
         #search-bar {
             width: 80%;
             max-width: 600px;
@@ -31,7 +37,7 @@
             width: 80%;
             max-width: 800px;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             background-color: white;
         }
@@ -71,62 +77,85 @@
 <body>
 
 <h1>Tableau des Symboles Mathématiques</h1>
-<input type="text" id="search-bar" placeholder="Rechercher un symbole ou une description..." oninput="filtrerSymboles()">
+<input type="text" id="search-bar" placeholder="Rechercher un symbole, un nom ou une description..." oninput="filtrerSymboles()">
 
-<table id="symbolTable">
-    <thead>
-        <tr>
-            <th>Symbole</th>
-            <th>Explication / Traduction</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Le contenu est généré dynamiquement -->
-    </tbody>
-</table>
+<div id="symbolContainer">
+    <!-- Les sections de symboles seront générées dynamiquement par JavaScript -->
+</div>
 
 <script>
-    let symboles = [];  // Stocke les symboles chargés depuis le fichier texte
+    let symbolesParChapitre = {};  // Stocke les symboles par chapitre
 
-    // Fonction pour charger le fichier symboles.txt
+    // Fonction pour charger et organiser les symboles par thème
     async function chargerSymboles() {
         const response = await fetch('symboles.txt');
         const data = await response.text();
-        symboles = data.split('\n').filter(line => line.trim() !== "").map(line => {
-            const [symbole, explication] = line.split('|').map(item => item.trim());
-            return { symbole, explication };
+        
+        let currentTheme = null;
+        data.split('\n').forEach(line => {
+            line = line.trim();
+            if (line.startsWith('[') && line.endsWith(']')) {
+                // Nouveau thème
+                currentTheme = line.slice(1, -1);
+                symbolesParChapitre[currentTheme] = [];
+            } else if (currentTheme && line.includes('|')) {
+                const [symbole, nom, explication] = line.split('|').map(item => item.trim());
+                symbolesParChapitre[currentTheme].push({ symbole, nom, explication });
+            }
         });
-        genererTableau(symboles);
+        genererSections(symbolesParChapitre);
     }
 
-    // Génère le tableau avec les symboles fournis
-    function genererTableau(symbolesAFiltrer) {
-        const tbody = document.getElementById("symbolTable").querySelector("tbody");
-        tbody.innerHTML = "";  // Nettoyage de contenu précédent
+    // Fonction pour générer les sections du tableau par thème
+    function genererSections(data) {
+        const container = document.getElementById("symbolContainer");
+        container.innerHTML = "";  // Nettoyage de contenu précédent
 
-        symbolesAFiltrer.forEach((item) => {
-            const row = document.createElement("tr");
+        for (const [theme, symboles] of Object.entries(data)) {
+            // Création du titre du thème
+            const themeTitle = document.createElement("h2");
+            themeTitle.className = "theme-title";
+            themeTitle.textContent = theme;
+            container.appendChild(themeTitle);
 
-            // Crée la cellule du symbole avec un événement de clic
-            const symboleCell = document.createElement("td");
-            symboleCell.textContent = item.symbole;
-            symboleCell.onclick = () => copyToClipboard(item.symbole, symboleCell);
-            const notice = document.createElement("span");
-            notice.classList.add("copied-notice");
-            notice.textContent = "Copié !";
-            symboleCell.appendChild(notice);
+            // Création du tableau pour le thème
+            const table = document.createElement("table");
+            const thead = document.createElement("thead");
+            thead.innerHTML = `<tr><th>Symbole</th><th>Nom</th><th>Explication</th></tr>`;
+            table.appendChild(thead);
 
-            // Crée la cellule de l'explication
-            const explicationCell = document.createElement("td");
-            explicationCell.textContent = item.explication;
+            const tbody = document.createElement("tbody");
+            symboles.forEach((item) => {
+                const row = document.createElement("tr");
 
-            row.appendChild(symboleCell);
-            row.appendChild(explicationCell);
-            tbody.appendChild(row);
-        });
+                // Cellule du symbole avec l'option de copier
+                const symboleCell = document.createElement("td");
+                symboleCell.textContent = item.symbole;
+                symboleCell.onclick = () => copyToClipboard(item.symbole, symboleCell);
+                const notice = document.createElement("span");
+                notice.classList.add("copied-notice");
+                notice.textContent = "Copié !";
+                symboleCell.appendChild(notice);
+
+                // Cellule du nom
+                const nomCell = document.createElement("td");
+                nomCell.textContent = item.nom;
+
+                // Cellule de l'explication
+                const explicationCell = document.createElement("td");
+                explicationCell.textContent = item.explication;
+
+                row.appendChild(symboleCell);
+                row.appendChild(nomCell);
+                row.appendChild(explicationCell);
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
     }
 
-    // Fonction pour copier le symbole dans le presse-papier
+    // Fonction de copie dans le presse-papier
     function copyToClipboard(symbol, cell) {
         navigator.clipboard.writeText(symbol).then(() => {
             const notice = cell.querySelector('.copied-notice');
@@ -137,16 +166,25 @@
         });
     }
 
-    // Fonction de filtrage pour la barre de recherche
+    // Fonction de recherche pour filtrer les symboles
     function filtrerSymboles() {
         const query = document.getElementById("search-bar").value.toLowerCase();
-        const symbolesFiltrés = symboles.filter(item =>
-            item.symbole.toLowerCase().includes(query) || item.explication.toLowerCase().includes(query)
-        );
-        genererTableau(symbolesFiltrés);
+        const resultats = {};
+
+        for (const [theme, symboles] of Object.entries(symbolesParChapitre)) {
+            const symbolesFiltrés = symboles.filter(item =>
+                item.symbole.toLowerCase().includes(query) ||
+                item.nom.toLowerCase().includes(query) ||
+                item.explication.toLowerCase().includes(query)
+            );
+            if (symbolesFiltrés.length > 0) {
+                resultats[theme] = symbolesFiltrés;
+            }
+        }
+        genererSections(resultats);
     }
 
-    // Charger les symboles au démarrage de la page
+    // Chargement des symboles au démarrage
     document.addEventListener("DOMContentLoaded", chargerSymboles);
 </script>
 
